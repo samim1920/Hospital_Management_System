@@ -1,0 +1,42 @@
+# =========================
+# Frontend
+# =========================
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.env
+
+# Keep example environment file
+!Frontend/.env.example
+
+
+# =========================
+# Backend
+# =========================
+Backend/**/target/
+Backend/**/.env
+
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+
+# =========================
+# Logs
+# =========================
+*.log
+
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
