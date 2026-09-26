@@ -176,57 +176,7 @@ const AddBankAccount = () => {
     try {
       setLoading(true);
 
-      /*
-       * Backend integration
-       *
-       * Later you can send this using FormData:
-       *
-       * const data = new FormData();
-       *
-       * data.append(
-       *   "accountHolderName",
-       *   formData.accountHolderName
-       * );
-       *
-       * data.append(
-       *   "accountNumber",
-       *   formData.accountNumber
-       * );
-       *
-       * data.append(
-       *   "ifscCode",
-       *   formData.ifscCode
-       * );
-       *
-       * data.append(
-       *   "bankName",
-       *   formData.bankName
-       * );
-       *
-       * data.append(
-       *   "branchName",
-       *   formData.branchName
-       * );
-       *
-       * data.append(
-       *   "accountType",
-       *   formData.accountType
-       * );
-       *
-       * data.append("bankImage", bankImage);
-       *
-       * await axios.post(
-       *   "http://localhost:9090/user/bank-account/add",
-       *   data,
-       *   {
-       *     headers: {
-       *       Authorization:
-       *         `Bearer ${localStorage.getItem("token")}`,
-       *     },
-       *   }
-       * );
-       */
-
+      
       // Temporary simulation
       await new Promise((resolve) =>
         setTimeout(resolve, 1000)
