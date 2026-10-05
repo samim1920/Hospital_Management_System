@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AuthService from "../Services/authService";
+import AxiosInterceptor from "../Interceptor/AxiosInterceptor";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -113,7 +113,7 @@ const Register = () => {
       setLoading(true);
 
       // Direct registration
-      await AuthService.register(userData);
+      await AxiosInterceptor.post("/user/register", userData);
 
       alert("Account registered successfully!");
 

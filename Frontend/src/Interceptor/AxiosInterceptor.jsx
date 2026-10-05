@@ -1,29 +1,34 @@
-
 import axios from "axios";
 
 // ==========================================
 // AXIOS INSTANCE
 // ==========================================
+
 console.log("API URL:", import.meta.env.VITE_API_URL);
 
 const AxiosInterceptor = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ,
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 15000,
 });
 
 // ==========================================
 // PUBLIC ENDPOINTS
 // ==========================================
+
 const publicEndpoints = [
   "/user/login",
+  "/user/register",
   "/user/test",
-  "/user/register/send-otp",
-  "/user/register/verify-otp",
 ];
 
-// Check whether an endpoint is public
+// ==========================================
+// CHECK WHETHER ENDPOINT IS PUBLIC
+// ==========================================
+
 const isPublicRequest = (url = "") => {
-  const requestPath = url.split("?")[0].replace(/\/+$/, "");
+  const requestPath = url
+    .split("?")[0]
+    .replace(/\/+$/, "");
 
   return publicEndpoints.some(
     (endpoint) =>
@@ -35,19 +40,27 @@ const isPublicRequest = (url = "") => {
 // ==========================================
 // REQUEST INTERCEPTOR
 // ==========================================
+
 AxiosInterceptor.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
     const isPublicEndpoint = isPublicRequest(config.url);
 
-    // Add JWT token to protected endpoints
+    // ==========================================
+    // ADD JWT TOKEN TO PROTECTED ENDPOINTS
+    // ==========================================
+
     if (token && !isPublicEndpoint) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
       delete config.headers.Authorization;
     }
 
-    // Set content type
+    // ==========================================
+    // CONTENT TYPE
+    // ==========================================
+
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
       delete config.headers["content-type"];
@@ -55,11 +68,23 @@ AxiosInterceptor.interceptors.request.use(
       config.headers["Content-Type"] = "application/json";
     }
 
-    // Debug information
+    // ==========================================
+    // DEBUG INFORMATION
+    // ==========================================
+
     console.log("➡️ Axios Request");
-    console.log("Method:", config.method?.toUpperCase());
-    console.log("URL:", `${config.baseURL}${config.url}`);
-    console.log("Public:", isPublicEndpoint);
+    console.log(
+      "Method:",
+      config.method?.toUpperCase()
+    );
+    console.log(
+      "URL:",
+      `${config.baseURL}${config.url}`
+    );
+    console.log(
+      "Public:",
+      isPublicEndpoint
+    );
     console.log(
       "Authorization:",
       config.headers.Authorization
@@ -69,6 +94,7 @@ AxiosInterceptor.interceptors.request.use(
 
     return config;
   },
+
   (error) => {
     console.error("❌ Request Error:", error);
     return Promise.reject(error);
@@ -78,6 +104,7 @@ AxiosInterceptor.interceptors.request.use(
 // ==========================================
 // RESPONSE INTERCEPTOR
 // ==========================================
+
 AxiosInterceptor.interceptors.response.use(
   (response) => {
     console.log("✅ Axios Response");
@@ -92,15 +119,25 @@ AxiosInterceptor.interceptors.response.use(
     if (error.response) {
       const status = error.response.status;
       const url = error.config?.url;
-      const isPublicEndpoint = isPublicRequest(url);
+
+      const isPublicEndpoint =
+        isPublicRequest(url);
 
       console.error("❌ API Error");
       console.error("Status:", status);
       console.error("URL:", url);
-      console.error("Backend Data:", error.response.data);
+      console.error(
+        "Backend Data:",
+        error.response.data
+      );
 
+      // ==========================================
       // 401 UNAUTHORIZED
+      // ==========================================
+
       if (status === 401) {
+        // Don't remove token or redirect for
+        // public endpoints such as register/login
         if (!isPublicEndpoint) {
           localStorage.removeItem("token");
           localStorage.removeItem("hospitalId");
@@ -114,13 +151,18 @@ AxiosInterceptor.interceptors.response.use(
           };
 
           // Prevent repeated redirects
-          if (window.location.pathname !== "/login") {
+          if (
+            window.location.pathname !== "/login"
+          ) {
             window.location.href = "/login";
           }
         }
       }
 
+      // ==========================================
       // 403 FORBIDDEN
+      // ==========================================
+
       else if (status === 403) {
         error.response.data = {
           status: 403,
@@ -129,27 +171,44 @@ AxiosInterceptor.interceptors.response.use(
         };
       }
 
+      // ==========================================
       // 404 NOT FOUND
+      // ==========================================
+
       else if (status === 404) {
         error.response.data = {
           status: 404,
-          message: "The requested resource was not found.",
+          message:
+            "The requested resource was not found.",
         };
       }
 
+      // ==========================================
       // 409 CONFLICT
+      // ==========================================
+
       else if (status === 409) {
-        // Keep the backend's business message
-        console.log("Conflict:", error.response.data);
+        console.log(
+          "Conflict:",
+          error.response.data
+        );
       }
 
+      // ==========================================
       // 400 BAD REQUEST
+      // ==========================================
+
       else if (status === 400) {
-        // Keep backend validation message
-        console.log("Bad request:", error.response.data);
+        console.log(
+          "Bad request:",
+          error.response.data
+        );
       }
 
+      // ==========================================
       // 500+ SERVER ERROR
+      // ==========================================
+
       else if (status >= 500) {
         console.error(
           "Internal server error:",
@@ -157,16 +216,22 @@ AxiosInterceptor.interceptors.response.use(
         );
 
         error.response.data = {
-          status,
+          status: status,
           message:
             "Something went wrong. Please try again later.",
         };
       }
     }
 
+    // ==========================================
     // NO RESPONSE FROM SERVER
+    // ==========================================
+
     else if (error.request) {
-      console.error("❌ Server is not responding");
+      console.error(
+        "❌ Server is not responding"
+      );
+
       console.error(
         "Request:",
         `${error.config?.baseURL}${error.config?.url}`
@@ -176,9 +241,15 @@ AxiosInterceptor.interceptors.response.use(
         "Unable to connect to the server. Please check your connection and try again.";
     }
 
+    // ==========================================
     // OTHER AXIOS ERROR
+    // ==========================================
+
     else {
-      console.error("❌ Axios Error:", error.message);
+      console.error(
+        "❌ Axios Error:",
+        error.message
+      );
 
       error.userMessage =
         "Something went wrong. Please try again.";
