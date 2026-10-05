@@ -58,10 +58,9 @@ public class TokenFilter
             // =========================================
 
             if (path.equals("/user/login")
+                    || path.equals("/user/register")
                     || path.equals("/user/create")
-                    || path.equals("/user/test")
-                    || path.equals("/user/register/send-otp")
-                    || path.equals("/user/register/verify-otp")) {
+                    || path.equals("/user/test")) {
 
                 return chain.filter(
                         exchange.mutate()
