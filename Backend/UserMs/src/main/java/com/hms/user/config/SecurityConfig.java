@@ -1,8 +1,8 @@
-
-        package com.hms.user.config;
+package com.hms.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,17 +36,21 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Allow CORS preflight requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**")
+                        .permitAll()
+
+                        // Allow requests coming from Gateway
                         .requestMatchers(request ->
                                 "SECRET".equals(
                                         request.getHeader("X-Secret-Key")
                                 )
                         ).permitAll()
 
+                        // Block everything else
                         .anyRequest().denyAll()
                 );
 
         return http.build();
     }
 }
-
-
